@@ -199,7 +199,7 @@ void loop(void) {
                                 Serial.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                         }
                 }
-                delay(5000);
+                delay(1000);
         }
 
         delay(500);
@@ -207,7 +207,7 @@ void loop(void) {
 
 void logNew(String sUid){
         if(wifiMulti.run() == WL_CONNECTED) {
-                http.begin("http://192.168.178.20/api/logs"); //HTTP
+                http.begin(String(serverUrl + "logs")); //HTTP
                 http.addHeader("Authorization", authHeader);
                 // start connection and send HTTP header
                 http.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -220,7 +220,7 @@ void logNew(String sUid){
 }
 void logKnownError(String sUid){
         if(wifiMulti.run() == WL_CONNECTED) {
-                http.begin("http://192.168.178.20/api/logs"); //HTTP
+                http.begin(String(serverUrl + "logs")); //HTTP
                 http.addHeader("Authorization", authHeader);
                 // start connection and send HTTP header
                 http.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -233,7 +233,7 @@ void logKnownError(String sUid){
 }
 void logKnownGranted(String sUid){
         if(wifiMulti.run() == WL_CONNECTED) {
-                http.begin("http://192.168.178.20/api/logs"); //HTTP
+                http.begin(String(serverUrl + "logs")); //HTTP
                 http.addHeader("Authorization", authHeader);
                 // start connection and send HTTP header
                 http.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -247,7 +247,7 @@ void logKnownGranted(String sUid){
 
 void syncGrants(){
         if(wifiMulti.run() == WL_CONNECTED) {
-                http.begin("http://192.168.178.20/api/doorUserGrants"); //HTTP
+                http.begin(String(serverUrl + "doorUserGrants")); //HTTP
                 http.addHeader("Authorization", authHeader);
                 // start connection and send HTTP header
                 int httpCode = http.GET();

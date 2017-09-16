@@ -9,6 +9,8 @@ const char* authHeader = "Bearer eyJ0eX...";
 const char* ssid1 = "MYSSID";
 const char* password1 = "MYPASS";
 
+String serverUrl = "http://my-ip/api/"; 
+
 //change for every door, otherwise otp will be overriden by another door
 const int selectBlock = 17; //
 
