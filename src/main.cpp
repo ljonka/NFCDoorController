@@ -5,6 +5,8 @@ Check permission of mifare classic cards, if access granted, open door
 
 Connect PN532 on esp8266 SPI bus, chip select on D3
 Connect door transistor/relais on D2
+
+Copyright (C) 2017  Leonid Verhovskij<info@leonv.de>
 */
 
 #include <ESP8266WiFi.h>
