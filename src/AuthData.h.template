@@ -1,0 +1,15 @@
+//Fill in all details as needed and rename to AuthData.h
+//AuthData.h
+#ifndef AUTH_DATA
+#define AUTH_DATA
+
+//change vor every door?
+const char* authHeader = "Bearer eyJ0eX...";
+
+const char* ssid1 = "MYSSID";
+const char* password1 = "MYPASS";
+
+//change for every door, otherwise otp will be overriden by another door
+const int selectBlock = 17; //
+
+#endif
