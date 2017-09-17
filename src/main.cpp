@@ -114,6 +114,10 @@ void loop(void) {
         // 'uid' will be populated with the UID, and uidLength will indicate
         // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
 
+        if(!nfc.inListPassiveTarget()){
+          delay(200);
+          return;
+        }
         if( nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength) ) {
 
                 String sUid = "";
