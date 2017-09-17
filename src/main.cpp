@@ -1,11 +1,11 @@
 /*
-NFCDoorController
+   NFCDoorController
 
-Check permission of mifare classic cards, if access granted, open door
+   Check permission of mifare classic cards, if access granted, open door
 
-Connect PN532 on esp8266 SPI bus, chip select on D3
-Connect door transistor/relais on D2
-*/
+   Connect PN532 on esp8266 SPI bus, chip select on D3
+   Connect door transistor/relais on D2
+ */
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
@@ -36,6 +36,8 @@ void logNew(String);
 void logKnownError(String);
 void logKnownGranted(String);
 void openDoor();
+void readNFC();
+void nfcInit();
 
 String response;
 String pathLogs = "/logs/";
@@ -51,8 +53,7 @@ void setup(void) {
         Serial.begin(115200);
         Serial.println("Booting");
 
-        SPIFFS.begin();
-        nfc.begin();
+        nfcInit();
         SPIFFS.begin();
 
         if(!SPIFFS.exists(pathStatus)) {
@@ -62,17 +63,6 @@ void setup(void) {
                 fPathStatus.close();
         }
 
-        uint32_t versiondata = nfc.getFirmwareVersion();
-
-        if (!versiondata) {
-                Serial.print("Didn't find PN53x board, going for sleep now...");
-                ESP.deepSleep(10e6); // 20e6 is 20 microseconds
-                delay(100);
-        }
-
-        // configure board to read RFID tags
-        nfc.SAMConfig();
-
         // Prepare keyData - all keys are set to FFFFFFFFFFFFh at chip delivery from the factory.
         for (byte i = 0; i < 6; i++) {
                 defAuthKey[i] = 0xFF;
@@ -80,8 +70,10 @@ void setup(void) {
 
         wifiMulti.addAP(ssid1, password1);
 
+
+
         // No authentication by default
-        ArduinoOTA.setPassword((const char *)"rvpO4OWjMoMPYQCbrb77");
+        ArduinoOTA.setPassword(otaPass);
 
         ArduinoOTA.onStart([] () {Serial.println("Start"); });
         ArduinoOTA.onEnd([] () { Serial.println("\nEnd"); });
@@ -98,23 +90,25 @@ void setup(void) {
 
         pinMode(doorPin, OUTPUT);
         digitalWrite(doorPin, LOW);
+
 }
 
 float lastSync = 0;
 bool synced = false;
+bool readNFCTask = false;
 void loop(void) {
         wifiMulti.run();
         ArduinoOTA.handle();
 
         //sync data every hour
-        if(!synced || millis() - lastSync > 3,6e6) {
+        if(!synced || millis() - lastSync > 36e6) {
                 syncGrants();
                 lastSync = millis();
         }
 
         uint8_t success;
-        uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
-        uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+        uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };    // Buffer to store the returned UID
+        uint8_t uidLength;                          // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
 
         // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
         // 'uid' will be populated with the UID, and uidLength will indicate
@@ -202,7 +196,45 @@ void loop(void) {
                 delay(1000);
         }
 
+        //check nfc health and reset if needed
+        uint32_t versiondata = nfc.getFirmwareVersion();
+
+        if (!versiondata) {
+                Serial.print("Didn't find PN53x board.");
+                //ESP.deepSleep(36e6); // 20e6 is 20 microseconds
+                //delay(100);
+                nfcInit();
+        }
+
         delay(500);
+}
+
+void nfcInit(){
+  pinMode(D1, OUTPUT);
+
+  //reset
+  digitalWrite(D1, HIGH);
+  delay(250);
+  digitalWrite(D1, LOW);
+  delay(400);
+
+  nfc.begin();
+
+  uint32_t versiondata = nfc.getFirmwareVersion();
+
+  if (!versiondata) {
+          Serial.print("Didn't find PN53x board, going for sleep now...");
+          ESP.deepSleep(36e6); // 20e6 is 20 microseconds
+          delay(100);
+  }
+  // configure board to read RFID tags
+  nfc.SAMConfig();
+  nfc.setPassiveActivationRetries(0xFF);
+
+}
+
+void readNFC(){
+        readNFCTask = true;
 }
 
 void logNew(String sUid){
@@ -285,7 +317,7 @@ void syncGrants(){
 }
 
 void openDoor(){
-  digitalWrite(doorPin, HIGH);
-  delay(3000);
-  digitalWrite(doorPin, LOW);
+        digitalWrite(doorPin, HIGH);
+        delay(3000);
+        digitalWrite(doorPin, LOW);
 }
