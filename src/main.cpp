@@ -3,9 +3,11 @@
 
    Check permission of mifare classic cards, if access granted, open door
 
-   Connect PN532 on esp8266 SPI bus, chip select on D3
-   Connect door transistor/relais on D2
- */
+Connect PN532 on esp8266 SPI bus, chip select on D3
+Connect door transistor/relais on D2
+
+Copyright (C) 2017  Leonid Verhovskij<info@leonv.de>
+*/
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
@@ -69,7 +71,7 @@ void setup(void) {
         }
 
         wifiMulti.addAP(ssid1, password1);
-        
+
         // No authentication by default
         ArduinoOTA.setPassword(otaPass);
 
