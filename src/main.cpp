@@ -69,9 +69,7 @@ void setup(void) {
         }
 
         wifiMulti.addAP(ssid1, password1);
-
-
-
+        
         // No authentication by default
         ArduinoOTA.setPassword(otaPass);
 
